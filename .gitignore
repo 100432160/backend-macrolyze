@@ -1,0 +1,10 @@
+# Entorno virtual
+venv/
+.env
+
+# Archivos compilados
+__pycache__/
+*.py[cod]
+
+# Archivos de configuración
+*.log
