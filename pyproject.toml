@@ -5,9 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "backend"
 dynamic = ["version"]
-description = ''
+description = 'API for macro-tracker'
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = "MIT"
 keywords = []
 authors = [
@@ -34,7 +34,20 @@ Source = "https://github.com/arturo_cardenal/backend"
 [tool.hatch.version]
 path = "src/backend/__about__.py"
 
+[tool.hatch.envs.default]
+python = "3.12"
+installer = "uv"
+path = ".venv"
+
+[tool.hatch.envs.default.scripts]
+dev = "uvicorn backend.main:app --reload"
+
+[tool.hatch.envs.default.env-vars]
+PYTHONASYNCIODEBUG = "1"
+
 [tool.hatch.envs.types]
+installer = "uv"
+
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
