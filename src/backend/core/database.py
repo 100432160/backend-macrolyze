@@ -1,10 +1,16 @@
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from backend.core.settings import settings
 
-engine = create_async_engine(settings.DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+DATABASE_URL = "sqlite+aiosqlite:///./macrolyze.db"  # Cambia según tu configuración
+
+engine = create_async_engine(DATABASE_URL, echo=True)
+Base = declarative_base()  # Define un único Base
+
+async_session = sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
 
 async def get_db():
-    async with SessionLocal() as session:
+    async with async_session() as session:
         yield session

@@ -1,7 +1,8 @@
 from sqlalchemy import Column, String, Float
 from sqlalchemy.dialects.postgresql import UUID
-from backend.core.base import Base
+from backend.core.database import Base
 import uuid
+from sqlalchemy.orm import relationship
 
 class Food(Base):
     __tablename__ = "foods"
@@ -12,3 +13,5 @@ class Food(Base):
     carbs = Column(Float, nullable=False)
     fats = Column(Float, nullable=False)
     kcals = Column(Float, nullable=False)
+
+    meal_foods = relationship("MealFood", back_populates="food")
