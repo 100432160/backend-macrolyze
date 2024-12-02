@@ -8,6 +8,11 @@ from backend.schemas.food_group import (
     FoodGroupItemCreate,
     FoodGroupItemResponse,
 )
+from backend.schemas.weekly_tracker import (
+    WeeklySummaryResponse,
+    WeeklyTrackerCreate,
+    WeeklyTrackerResponse,
+)
 
 __all__ = [
     "UserCreate",
@@ -26,4 +31,7 @@ __all__ = [
     "FoodGroupResponse",
     "FoodGroupItemCreate",
     "FoodGroupItemResponse",
+    "WeeklySummaryResponse",
+    "WeeklyTrackerCreate",
+    "WeeklyTrackerResponse",
 ]

@@ -14,3 +14,4 @@ class User(Base):
 
     meals = relationship("Meal", back_populates="user")
     food_groups = relationship("FoodGroup", back_populates="user", cascade="all, delete-orphan")
+    weekly_trackers = relationship("WeeklyTracker", back_populates="user")

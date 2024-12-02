@@ -4,9 +4,10 @@ from backend.models.meal import Meal
 from backend.models.meal_food import MealFood
 from backend.models.food_group import FoodGroup
 from backend.models.food_group_item import FoodGroupItem
+from backend.models.weekly_tracker import WeeklyTracker
 
 # Importa el Base compartido
 from backend.core.database import Base
 
 # Asegúrate de registrar todos los modelos en `__all__` para evitar problemas
-__all__ = ["User", "Food", "Meal", "MealFood", "FoodGroup", "FoodGroupItem", "Base"]
+__all__ = ["User", "Food", "Meal", "MealFood", "FoodGroup", "FoodGroupItem", "Base", "WeeklyTracker"]
