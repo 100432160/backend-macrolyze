@@ -1,3 +1,4 @@
+hatch
 pre-commit
 fastapi[all]
 uvicorn
