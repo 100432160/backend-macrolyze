@@ -2,8 +2,11 @@ from backend.models.user import User
 from backend.models.food import Food
 from backend.models.meal import Meal
 from backend.models.meal_food import MealFood
+from backend.models.food_group import FoodGroup
+from backend.models.food_group_item import FoodGroupItem
 
-from backend.core.database import Base  # Base compartida
+# Importa el Base compartido
+from backend.core.database import Base
 
-# Registra explícitamente los modelos en Base.metadata
-__all__ = ["User", "Food", "Meal", "MealFood"]
+# Asegúrate de registrar todos los modelos en `__all__` para evitar problemas
+__all__ = ["User", "Food", "Meal", "MealFood", "FoodGroup", "FoodGroupItem", "Base"]
