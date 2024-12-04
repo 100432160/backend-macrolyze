@@ -9,3 +9,5 @@ __pycache__/
 
 # Archivos de configuración
 *.log
+
+/src/backend/core/config.py

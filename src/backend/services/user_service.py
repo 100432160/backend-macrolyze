@@ -4,20 +4,20 @@ from backend.models.user import User
 from backend.schemas.user import UserCreate, UserUpdate
 from passlib.context import CryptContext
 from uuid import UUID
+from datetime import datetime, timedelta, timezone
+import jwt
+from backend.core.config import SECRET_KEY, ALGORITHM
 from fastapi import HTTPException
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Crear un nuevo usuario
 async def create_user(db: AsyncSession, user: UserCreate):
-    # Verificar si el email ya está registrado
     result = await db.execute(select(User).where(User.email == user.email))
     existing_user = result.scalars().first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hashear la contraseña
     hashed_password = pwd_context.hash(user.password)
     new_user = User(username=user.username, email=user.email, password=hashed_password)
     db.add(new_user)
@@ -42,9 +42,9 @@ async def update_user_service(db: AsyncSession, user_id: UUID, updates: UserUpda
         return None
 
     if updates.username:
-        user.username = updates.username  # Actualiza el username
+        user.username = updates.username
     if updates.password:
-        user.password = pwd_context.hash(updates.password)  # Hashea la nueva contraseña
+        user.password = pwd_context.hash(updates.password)
 
     await db.commit()
     await db.refresh(user)
@@ -68,3 +68,11 @@ async def authenticate_user(db: AsyncSession, username: str, password: str):
     if user and pwd_context.verify(password, user.password):
         return user
     return None
+
+# Crear un token JWT
+def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(minutes=15))
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt

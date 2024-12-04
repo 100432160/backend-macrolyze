@@ -26,3 +26,12 @@ class UserUpdate(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+
+# Nuevo esquema para el token
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+# Esquema para los datos del token
+class TokenData(BaseModel):
+    username: str | None = None

@@ -8,3 +8,4 @@ sqlmodel
 sqlalchemy
 aiosqlite
 python-dotenv
+python-decouple
