@@ -7,7 +7,7 @@ from backend.schemas.food_group import (
 )
 from backend.services.food_group_service import (
     create_food_group, get_food_groups_by_user, update_food_group, delete_food_group,
-    add_food_to_group, update_food_in_group, remove_food_from_group
+    add_food_to_group, get_foods_by_group, update_food_in_group, remove_food_from_group
 )
 
 router = APIRouter(prefix="/api/food_groups", tags=["Food Groups"])
@@ -32,6 +32,10 @@ async def delete_group(group_id: UUID, db: AsyncSession = Depends(get_db)):
 @router.post("/{group_id}/foods", response_model=FoodGroupItemResponse)
 async def add_food(group_id: UUID, data: FoodGroupItemCreate, db: AsyncSession = Depends(get_db)):
     return await add_food_to_group(db, data)
+
+@router.get("/{group_id}/foods", response_model=list[FoodGroupItemResponse])
+async def get_foods_in_group(group_id: UUID, db: AsyncSession = Depends(get_db)):
+    return await get_foods_by_group(db, group_id)
 
 @router.put("/{group_id}/foods/{food_id}", response_model=FoodGroupItemResponse)
 async def update_food(group_id: UUID, food_id: UUID, quantity: float, db: AsyncSession = Depends(get_db)):

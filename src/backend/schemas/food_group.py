@@ -31,6 +31,8 @@ class FoodGroupItemResponse(FoodGroupItemBase):
     id: UUID
     food_group_id: UUID
     food_id: UUID
+    food_name: str  # Añadimos el nombre del alimento
+    default_quantity: float  # Añadimos la cantidad predeterminada
 
     class Config:
         from_attributes = True

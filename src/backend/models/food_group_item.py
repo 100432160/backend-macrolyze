@@ -13,4 +13,4 @@ class FoodGroupItem(Base):
     default_quantity = Column(Float, nullable=False)
 
     food_group = relationship("FoodGroup", back_populates="items")
-    food = relationship("Food")
+    food = relationship("Food", back_populates="food_group_items", lazy="joined")

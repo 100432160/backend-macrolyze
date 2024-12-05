@@ -15,3 +15,4 @@ class Food(Base):
     kcals = Column(Float, nullable=False)
 
     meal_foods = relationship("MealFood", back_populates="food")
+    food_group_items = relationship("FoodGroupItem", back_populates="food")
