@@ -21,7 +21,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 router = APIRouter(prefix="/api/users", tags=["Users"])
 
 # Crear un nuevo usuario
-@router.post("/", response_model=Token, status_code=201)
+@router.post("/", response_model=dict, status_code=201)
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     stmt = select(User).where(User.email == user.email)
     result = await db.execute(stmt)
@@ -41,7 +41,11 @@ async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": new_user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user_id": str(new_user.id)
+    }
 
 # Obtener todos los usuarios
 @router.get("/", response_model=list[UserResponse])
@@ -80,9 +84,12 @@ async def delete_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
     return None
 
 # Login de usuario
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=dict)
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     authenticated_user = await authenticate_user(db, user.username, user.password)
+    print("****************************************************************************")
+    print("authenticated_user: " + str(authenticated_user))
+    print("****************************************************************************")
     if not authenticated_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,4 +100,8 @@ async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     access_token = create_access_token(
         data={"sub": authenticated_user.username}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "user_id": str(authenticated_user.id)    
+    }
