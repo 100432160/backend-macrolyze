@@ -95,19 +95,34 @@ async def get_foods_by_group(db: AsyncSession, group_id: UUID):
     return response
 
 # Update default quantity of a food in a group
-async def update_food_in_group(db: AsyncSession, group_id: UUID, food_id: UUID, quantity: float):
-    item = await db.execute(select(FoodGroupItem).where(
-        FoodGroupItem.food_group_id == group_id,
-        FoodGroupItem.food_id == food_id
-    ))
+async def update_food_in_group(db: AsyncSession, group_id: UUID, group_item_id: UUID, quantity: float):
+    item = await db.execute(
+        select(FoodGroupItem)
+        .options(joinedload(FoodGroupItem.food))  # Carga la relación con la tabla Food
+        .where(
+            FoodGroupItem.food_group_id == group_id,
+            FoodGroupItem.id == group_item_id
+        )
+    )
     item = item.scalars().first()
+
     if not item:
         raise HTTPException(status_code=404, detail="Food item not found in group")
 
+    # Actualizar la cantidad
     item.default_quantity = quantity
     await db.commit()
     await db.refresh(item)
-    return item
+
+    # Retornar los datos actualizados incluyendo `food_name`
+    return {
+        "id": item.id,
+        "food_group_id": item.food_group_id,
+        "food_id": item.food_id,
+        "food_name": item.food.food_name,  # Incluye el nombre del alimento
+        "default_quantity": item.default_quantity,
+    }
+
 
 # Remove a food from a food group by group_item_id
 async def remove_food_group_item_by_id(db: AsyncSession, group_id: UUID, group_item_id: UUID):

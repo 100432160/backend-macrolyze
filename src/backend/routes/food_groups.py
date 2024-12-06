@@ -37,9 +37,9 @@ async def add_food(group_id: UUID, data: FoodGroupItemCreate, db: AsyncSession =
 async def get_foods_in_group(group_id: UUID, db: AsyncSession = Depends(get_db)):
     return await get_foods_by_group(db, group_id)
 
-@router.put("/{group_id}/foods/{food_id}", response_model=FoodGroupItemResponse)
-async def update_food(group_id: UUID, food_id: UUID, quantity: float, db: AsyncSession = Depends(get_db)):
-    return await update_food_in_group(db, group_id, food_id, quantity)
+@router.put("/{group_id}/foods/items/{group_item_id}", response_model=FoodGroupItemResponse)
+async def update_food(group_id: UUID, group_item_id: UUID, quantity: float, db: AsyncSession = Depends(get_db)):
+    return await update_food_in_group(db, group_id, group_item_id, quantity)
 
 @router.delete("/{group_id}/foods/items/{group_item_id}")
 async def remove_food_item(group_id: UUID, group_item_id: UUID, db: AsyncSession = Depends(get_db)):
