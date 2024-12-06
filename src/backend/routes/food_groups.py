@@ -7,7 +7,7 @@ from backend.schemas.food_group import (
 )
 from backend.services.food_group_service import (
     create_food_group, get_food_groups_by_user, update_food_group, delete_food_group,
-    add_food_to_group, get_foods_by_group, update_food_in_group, remove_food_from_group
+    add_food_to_group, get_foods_by_group, update_food_in_group, remove_food_group_item_by_id
 )
 
 router = APIRouter(prefix="/api/food_groups", tags=["Food Groups"])
@@ -41,7 +41,8 @@ async def get_foods_in_group(group_id: UUID, db: AsyncSession = Depends(get_db))
 async def update_food(group_id: UUID, food_id: UUID, quantity: float, db: AsyncSession = Depends(get_db)):
     return await update_food_in_group(db, group_id, food_id, quantity)
 
-@router.delete("/{group_id}/foods/{food_id}")
-async def remove_food(group_id: UUID, food_id: UUID, db: AsyncSession = Depends(get_db)):
-    await remove_food_from_group(db, group_id, food_id)
+@router.delete("/{group_id}/foods/items/{group_item_id}")
+async def remove_food_item(group_id: UUID, group_item_id: UUID, db: AsyncSession = Depends(get_db)):
+    # Llama al servicio para eliminar el item por su ID
+    await remove_food_group_item_by_id(db, group_id, group_item_id)
     return {"success": True}

@@ -109,16 +109,23 @@ async def update_food_in_group(db: AsyncSession, group_id: UUID, food_id: UUID, 
     await db.refresh(item)
     return item
 
-# Remove a food from a food group
-async def remove_food_from_group(db: AsyncSession, group_id: UUID, food_id: UUID):
-    item = await db.execute(select(FoodGroupItem).where(
-        FoodGroupItem.food_group_id == group_id,
-        FoodGroupItem.food_id == food_id
-    ))
+# Remove a food from a food group by group_item_id
+async def remove_food_group_item_by_id(db: AsyncSession, group_id: UUID, group_item_id: UUID):
+    # Busca el item en la base de datos usando `group_item_id` y `group_id`
+    item = await db.execute(
+        select(FoodGroupItem).where(
+            FoodGroupItem.id == group_item_id,
+            FoodGroupItem.food_group_id == group_id
+        )
+    )
     item = item.scalars().first()
+    
+    # Verifica si el item existe
     if not item:
-        raise HTTPException(status_code=404, detail="Food item not found in group")
+        raise HTTPException(status_code=404, detail="Food item not found in the specified group")
 
+    # Elimina el item si existe
     await db.delete(item)
     await db.commit()
     return True
+
