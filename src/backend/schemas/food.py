@@ -11,7 +11,7 @@ class FoodBase(BaseModel):
 
 # Esquema para crear alimentos
 class FoodCreate(FoodBase):
-    pass
+    user_id: UUID
 
 # Esquema para actualizar alimentos
 class FoodUpdate(BaseModel):
@@ -23,6 +23,7 @@ class FoodUpdate(BaseModel):
 # Esquema para la respuesta
 class FoodResponse(FoodBase):
     id: UUID
+    user_id: UUID
 
     class Config:
         from_attributes = True

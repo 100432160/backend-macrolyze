@@ -16,8 +16,8 @@ async def create_food_endpoint(food: FoodCreate, db: AsyncSession = Depends(get_
 
 # Obtener todos los alimentos
 @router.get("/", response_model=list[FoodResponse])
-async def get_all_foods_endpoint(db: AsyncSession = Depends(get_db)):
-    return await get_all_foods(db)
+async def get_all_foods_endpoint(user_id: UUID, db: AsyncSession = Depends(get_db)):
+    return await get_all_foods(db, user_id)
 
 # Obtener un alimento por ID
 @router.get("/{food_id}", response_model=FoodResponse)

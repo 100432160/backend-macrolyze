@@ -13,5 +13,6 @@ class User(Base):
     password = Column(String, nullable=False)
 
     meals = relationship("Meal", back_populates="user")
+    foods = relationship("Food", back_populates="user")
     food_groups = relationship("FoodGroup", back_populates="user", cascade="all, delete-orphan")
     weekly_trackers = relationship("WeeklyTracker", back_populates="user")

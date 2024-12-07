@@ -12,7 +12,8 @@ async def create_food(db: AsyncSession, food: FoodCreate):
         proteins=food.proteins,
         carbs=food.carbs,
         fats=food.fats,
-        kcals=food.kcals
+        kcals=food.kcals,
+        user_id=food.user_id
     )
     db.add(new_food)
     await db.commit()
@@ -20,8 +21,8 @@ async def create_food(db: AsyncSession, food: FoodCreate):
     return new_food
 
 # Obtener todos los alimentos
-async def get_all_foods(db: AsyncSession):
-    result = await db.execute(select(Food))
+async def get_all_foods(db: AsyncSession, user_id: UUID):
+    result = await db.execute(select(Food).where(Food.user_id == user_id))
     return result.scalars().all()
 
 # Obtener un alimento por ID
