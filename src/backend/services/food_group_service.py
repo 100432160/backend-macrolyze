@@ -69,6 +69,10 @@ async def add_food_to_group(db: AsyncSession, food_item_data: FoodGroupItemCreat
         "food_id": item_with_food.food_id,
         "food_name": item_with_food.food.food_name,  # Accede al nombre del alimento
         "default_quantity": item_with_food.default_quantity,
+        "protein_per_100g": item_with_food.food.proteins,  # Obtener desde Food
+        "carbs_per_100g": item_with_food.food.carbs,
+        "fats_per_100g": item_with_food.food.fats,
+        "calories_per_100g": item_with_food.food.kcals,
     }
 
 # Get all foods in a food group
@@ -88,6 +92,10 @@ async def get_foods_by_group(db: AsyncSession, group_id: UUID):
             "food_id": item.food_id,
             "food_name": item.food.food_name,  # Acceso al nombre del alimento
             "default_quantity": item.default_quantity,
+            "protein_per_100g": item.food.proteins,
+            "carbs_per_100g": item.food.carbs,
+            "fats_per_100g": item.food.fats,
+            "calories_per_100g": item.food.kcals,
         }
         for item in items
     ]
@@ -95,10 +103,12 @@ async def get_foods_by_group(db: AsyncSession, group_id: UUID):
     return response
 
 # Update default quantity of a food in a group
+# Update default quantity of a food in a group
 async def update_food_in_group(db: AsyncSession, group_id: UUID, group_item_id: UUID, quantity: float):
+    # Obtener el alimento dentro del grupo con la relación a Food
     item = await db.execute(
         select(FoodGroupItem)
-        .options(joinedload(FoodGroupItem.food))  # Carga la relación con la tabla Food
+        .options(joinedload(FoodGroupItem.food))  # Asegura que se cargue la relación con Food
         .where(
             FoodGroupItem.food_group_id == group_id,
             FoodGroupItem.id == group_item_id
@@ -109,20 +119,23 @@ async def update_food_in_group(db: AsyncSession, group_id: UUID, group_item_id: 
     if not item:
         raise HTTPException(status_code=404, detail="Food item not found in group")
 
-    # Actualizar la cantidad
+    # Actualizar la cantidad predeterminada
     item.default_quantity = quantity
     await db.commit()
     await db.refresh(item)
 
-    # Retornar los datos actualizados incluyendo `food_name`
+    # Construir y retornar una respuesta completa
     return {
         "id": item.id,
         "food_group_id": item.food_group_id,
         "food_id": item.food_id,
-        "food_name": item.food.food_name,  # Incluye el nombre del alimento
+        "food_name": item.food.food_name,  # Acceso al nombre del alimento
         "default_quantity": item.default_quantity,
+        "protein_per_100g": item.food.proteins,  # Incluye los macronutrientes
+        "carbs_per_100g": item.food.carbs,
+        "fats_per_100g": item.food.fats,
+        "calories_per_100g": item.food.kcals,
     }
-
 
 # Remove a food from a food group by group_item_id
 async def remove_food_group_item_by_id(db: AsyncSession, group_id: UUID, group_item_id: UUID):

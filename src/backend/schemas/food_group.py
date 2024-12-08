@@ -33,6 +33,10 @@ class FoodGroupItemResponse(FoodGroupItemBase):
     food_id: UUID
     food_name: str  # Añadimos el nombre del alimento
     default_quantity: float  # Añadimos la cantidad predeterminada
+    protein_per_100g: float  # Proteínas por cada 100 g
+    carbs_per_100g: float  # Carbohidratos por cada 100 g
+    fats_per_100g: float  # Grasas por cada 100 g
+    calories_per_100g: float  # Calorías por cada 100 g
 
     class Config:
         from_attributes = True
