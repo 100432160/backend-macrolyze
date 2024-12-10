@@ -14,6 +14,11 @@ async def create_meal(db: AsyncSession, meal_data: MealCreate):
     await db.refresh(new_meal)
     return new_meal
 
+# Obtener todas las comidas de un usuario
+async def get_all_meals_by_user_service(db: AsyncSession, user_id: UUID):
+    result = await db.execute(select(Meal).where(Meal.user_id == user_id))
+    return result.scalars().all()
+
 # Obtener comidas de un usuario en una fecha específica
 async def get_meals_by_user_and_date(db: AsyncSession, user_id: UUID, date: str):
     result = await db.execute(select(Meal).where(Meal.user_id == user_id, Meal.date == date))

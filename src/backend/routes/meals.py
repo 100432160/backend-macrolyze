@@ -6,7 +6,7 @@ from backend.schemas.meal import (
     MealCreate, MealResponse, MealUpdate, MealFoodCreate, MealFoodResponse
 )
 from backend.services.meal_service import (
-    create_meal, get_meals_by_user_and_date, update_meal, delete_meal,
+    create_meal, get_all_meals_by_user_service, get_meals_by_user_and_date, update_meal, delete_meal,
     add_food_to_meal, update_food_in_meal, remove_food_from_meal
 )
 
@@ -16,6 +16,11 @@ router = APIRouter(prefix="/api/meals", tags=["Meals"])
 @router.post("/", response_model=MealResponse, status_code=201)
 async def create_meal_endpoint(meal: MealCreate, db: AsyncSession = Depends(get_db)):
     return await create_meal(db, meal)
+
+# Obtener todas las comidas de un usuario
+@router.get("/{user_id}", response_model=list[MealResponse])
+async def get_all_meals_by_user(user_id: UUID, db: AsyncSession = Depends(get_db)):
+    return await get_all_meals_by_user_service(db, user_id)
 
 # Obtener comidas por usuario y fecha
 @router.get("/{user_id}/{date}", response_model=list[MealResponse])
