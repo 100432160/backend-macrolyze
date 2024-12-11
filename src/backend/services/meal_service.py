@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
 from uuid import UUID
+from backend.models.food import Food  # Importa el modelo de Food
 from backend.models.meal import Meal
 from backend.models.meal_food import MealFood
 from backend.schemas.meal import MealCreate, MealUpdate, MealFoodCreate
@@ -51,13 +53,59 @@ async def delete_meal(db: AsyncSession, meal_id: UUID):
     await db.commit()
     return None
 
-# Agregar un alimento a una comida
+
 async def add_food_to_meal(db: AsyncSession, meal_id: UUID, food_data: MealFoodCreate):
-    new_meal_food = MealFood(meal_id=meal_id, food_id=food_data.food_id, quantity=food_data.quantity)
-    db.add(new_meal_food)
-    await db.commit()
-    await db.refresh(new_meal_food)
-    return new_meal_food
+    # Verificar si la relación ya existe
+    result = await db.execute(
+        select(MealFood).where(MealFood.meal_id == meal_id, MealFood.food_id == food_data.food_id)
+    )
+    existing_relationship = result.scalars().first()
+
+    if existing_relationship:
+        raise HTTPException(
+            status_code=400, 
+            detail="The food is already added to the meal. Use update instead."
+        )
+
+    # Si no existe, crear una nueva relación
+    try:
+        new_meal_food = MealFood(meal_id=meal_id, food_id=food_data.food_id, quantity=food_data.quantity)
+        db.add(new_meal_food)
+        await db.commit()
+        await db.refresh(new_meal_food)
+
+        # Obtener los detalles del alimento relacionado
+        food_result = await db.execute(
+            select(Food).where(Food.id == food_data.food_id)
+        )
+        food = food_result.scalars().first()
+
+        if not food:
+            raise HTTPException(
+                status_code=404,
+                detail="Food not found."
+            )
+
+        # Construir la respuesta con los detalles del alimento
+        return {
+            "meal_id": meal_id,
+            "food_id": {
+                "id": food.id,
+                "food_name": food.food_name,
+                "proteins": food.proteins,
+                "carbs": food.carbs,
+                "fats": food.fats,
+                "kcals": food.kcals,
+                "user_id": food.user_id,
+            },
+            "quantity": food_data.quantity,
+        }
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="An unexpected error occurred while adding the food to the meal."
+        )
 
 # Actualizar la cantidad de un alimento en una comida
 async def update_food_in_meal(db: AsyncSession, meal_id: UUID, food_id: UUID, quantity: float):
@@ -81,3 +129,55 @@ async def remove_food_from_meal(db: AsyncSession, meal_id: UUID, food_id: UUID):
     await db.delete(meal_food)
     await db.commit()
     return None
+
+# Obtener todos los alimentos asociados a una comida
+async def get_foods_by_meal(db: AsyncSession, meal_id: UUID):
+    print("_________________________________________________________________")
+    print(f"Fetching foods for meal_id: {meal_id}")
+    print("_________________________________________________________________")
+    try:
+        # Obtener la comida
+        meal_result = await db.execute(select(Meal).where(Meal.id == meal_id))
+        meal = meal_result.scalars().first()
+        if not meal:
+            raise HTTPException(status_code=404, detail="Meal not found")
+
+        # Obtener los alimentos asociados a la comida
+        foods_result = await db.execute(
+            select(MealFood, Food)
+            .join(Food, MealFood.food_id == Food.id)
+            .where(MealFood.meal_id == meal_id)
+        )
+        meal_foods = foods_result.all()
+
+        # Construir la lista de alimentos
+        foods = [
+            {
+                "id": food.id,
+                "user_id": food.user_id,
+                "food_name": food.food_name,
+                "proteins": food.proteins,
+                "carbs": food.carbs,
+                "fats": food.fats,
+                "kcals": food.kcals,
+                "quantity": meal_food.quantity,
+            }
+            for meal_food, food in meal_foods
+        ]
+
+        print("Foods being returned:", foods)
+
+        # Retornar la respuesta jerárquica
+        return {
+            "meal_id": meal.id,
+            "type": meal.type,
+            "date": meal.date,
+            "foods": foods
+        }
+    except Exception as e:
+        print(f"Error fetching foods for meal: {e}")
+        raise HTTPException(
+            status_code=500, detail="An error occurred while fetching foods for the meal"
+        )
+
+

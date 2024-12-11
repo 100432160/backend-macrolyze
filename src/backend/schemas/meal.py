@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from uuid import UUID
 from datetime import date
-from typing import Optional
+from typing import Optional, List
+from backend.schemas.food import FoodResponse, FoodInMealResponse, FoodMealResponse
 
 # Esquema base para una comida
 class MealBase(BaseModel):
@@ -35,6 +36,24 @@ class MealFoodResponse(BaseModel):
     meal_id: UUID
     food_id: UUID
     quantity: float  # Cantidad de alimento
+
+    class Config:
+        from_attributes = True
+
+class MealFoodCreateResponse(BaseModel):
+    meal_id: UUID
+    food_id: FoodMealResponse
+    quantity: float  # Cantidad de alimento
+
+    class Config:
+        from_attributes = True
+
+# Esquema para la respuesta de obtener todos los alimentos de una comida
+class MealWithFoodsResponse(BaseModel):
+    meal_id: UUID
+    type: str
+    date: date
+    foods: List[FoodInMealResponse]  # Lista de alimentos asociados a la comida
 
     class Config:
         from_attributes = True

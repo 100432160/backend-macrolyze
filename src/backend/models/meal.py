@@ -13,4 +13,4 @@ class Meal(Base):
     date = Column(Date, nullable=False)
 
     user = relationship("User", back_populates="meals")
-    meal_foods = relationship("MealFood", back_populates="meal")
+    meal_foods = relationship("MealFood", back_populates="meal", cascade="all, delete-orphan")

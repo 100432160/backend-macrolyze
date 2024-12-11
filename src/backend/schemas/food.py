@@ -21,9 +21,40 @@ class FoodUpdate(BaseModel):
     kcals: float = None
 
 # Esquema para la respuesta
+class FoodInMealResponse(FoodBase):
+    id: UUID
+    user_id: UUID
+    food_name: str
+    proteins: float
+    carbs: float
+    fats: float
+    kcals: float
+    quantity: float
+
+    class Config:
+        from_attributes = True
+
+# Esquema para la respuesta
+class FoodMealResponse(FoodBase):
+    id: UUID
+    user_id: UUID
+    food_name: str
+    proteins: float
+    carbs: float
+    fats: float
+    kcals: float
+
+    class Config:
+        from_attributes = True
+
+# Esquema para la respuesta
 class FoodResponse(FoodBase):
     id: UUID
     user_id: UUID
+    proteins: float
+    carbs: float
+    fats: float
+    kcals: float
 
     class Config:
         from_attributes = True
